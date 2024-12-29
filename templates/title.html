@@ -124,10 +124,9 @@
 
             {% if current_user.is_authenticated %}
                 <div class="new-entry-section mt-4">
-                    <form method="POST" action="{{ url_for('main.title', title_name=title.title) }}">
+                    <form method="POST">
                         {{ form.hidden_tag() }}
                         <div class="form-group mb-3">
-                            {{ form.content.label(class="form-control-label") }}
                             {{ form.content(class="form-control", rows="5", placeholder="bu başlığa bir şeyler yaz...") }}
                             {% if form.content.errors %}
                                 {% for error in form.content.errors %}

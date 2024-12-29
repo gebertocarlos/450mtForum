@@ -62,20 +62,20 @@ def title(title_name):
     page = request.args.get('page', 1, type=int)
     title = Title.query.filter_by(title=title_name).first_or_404()
     form = EntryForm()
+    form.title.data = title.title
     
-    if form.validate_on_submit():
-        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
-        db.session.add(entry)
-        db.session.commit()
-        flash('Entry başarıyla eklendi!', 'success')
-        return redirect(url_for('main.title', title_name=title.title))
+    if current_user.is_authenticated and request.method == 'POST':
+        if form.validate_on_submit():
+            entry = Entry(content=form.content.data, author=current_user, title_obj=title)
+            db.session.add(entry)
+            db.session.commit()
+            flash('Entry başarıyla eklendi!', 'success')
+            return redirect(url_for('main.title', title_name=title.title))
         
     entries = Entry.query.filter_by(title_id=title.id)\
         .order_by(Entry.date_posted.asc())\
         .paginate(page=page, per_page=10)
     trending_topics = get_trending_topics()
-    if title:
-        form.title.data = title.title
     return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics, form=form)
 
 @main.route('/entry/<int:entry_id>', methods=['GET'])
