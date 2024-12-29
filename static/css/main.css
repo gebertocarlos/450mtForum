@@ -1,0 +1,491 @@
+body {
+    background-color: #1d2935;
+    color: #bdbdbd;
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin-top: 3rem;
+}
+
+.navbar {
+    background-color: #1d2935 !important;
+    border-bottom: 1px solid #2d3b47;
+    padding: 0.5rem 1rem;
+}
+
+.navbar-toggler {
+    border-color: #3d4b57 !important;
+    padding: 4px 8px;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28189, 189, 189, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar-brand {
+    color: #81c14b !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #bdbdbd !important;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link:hover {
+    color: #fff !important;
+    background-color: #2d3b47;
+}
+
+.content-section {
+    background: #2d3b47;
+    padding: 20px;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.entry-title {
+    color: #81c14b;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+
+.entry-title:hover {
+    color: #9ed374;
+    text-decoration: none;
+}
+
+.entry-content {
+    white-space: pre-line;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #bdbdbd;
+}
+
+.entry-metadata {
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #3d4b57;
+}
+
+.entry-metadata a {
+    color: #81c14b;
+    text-decoration: none;
+}
+
+.entry-metadata a:hover {
+    color: #9ed374;
+    text-decoration: none;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.btn-primary {
+    background-color: #81c14b;
+    border-color: #81c14b;
+}
+
+.btn-primary:hover {
+    background-color: #9ed374;
+    border-color: #9ed374;
+}
+
+.btn-outline-light {
+    color: #bdbdbd;
+    border-color: #3d4b57;
+}
+
+.btn-outline-light:hover {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+    color: #fff;
+}
+
+.form-control {
+    background-color: #1d2935;
+    border-color: #3d4b57;
+    color: #bdbdbd;
+}
+
+.form-control:focus {
+    background-color: #1d2935;
+    border-color: #81c14b;
+    color: #bdbdbd;
+    box-shadow: 0 0 0 0.2rem rgba(129, 193, 75, 0.25);
+}
+
+.list-group-item {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+    color: #bdbdbd;
+}
+
+.list-group-item a {
+    color: #81c14b;
+}
+
+.list-group-item a:hover {
+    color: #9ed374;
+}
+
+.badge {
+    background-color: #1d2935 !important;
+    color: #6c757d;
+}
+
+.alert {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+    color: #bdbdbd;
+}
+
+.alert-success {
+    background-color: rgba(129, 193, 75, 0.1);
+    border-color: #81c14b;
+    color: #81c14b;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.modal-content {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+}
+
+.modal-header {
+    border-bottom-color: #3d4b57;
+}
+
+.modal-footer {
+    border-top-color: #3d4b57;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.page-link {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+    color: #81c14b;
+}
+
+.page-link:hover {
+    background-color: #1d2935;
+    border-color: #3d4b57;
+    color: #9ed374;
+}
+
+.page-item.active .page-link {
+    background-color: #81c14b;
+    border-color: #81c14b;
+    color: #fff;
+}
+
+.page-item.disabled .page-link {
+    background-color: #2d3b47;
+    border-color: #3d4b57;
+    color: #6c757d;
+}
+
+/* Ekşi Sözlük spesifik stiller */
+.entry-list {
+    border-left: 4px solid #2d3b47;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.entry-footer {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.entry-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.entry-author {
+    font-size: 0.9rem;
+    color: #81c14b;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    background-color: #1d2935;
+    border: 1px solid #3d4b57;
+    color: #bdbdbd;
+    padding: 0.375rem 0.75rem;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+}
+
+.search-input:focus {
+    border-color: #81c14b;
+    outline: none;
+}
+
+/* Mobil Optimizasyonları */
+@media (max-width: 768px) {
+    body {
+        margin-top: 2rem;
+        font-size: 14px;
+    }
+
+    .navbar {
+        padding: 0.3rem 0.5rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .search-form {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .search-input {
+        width: 100%;
+        margin-right: 0.3rem;
+    }
+
+    .content-section {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 2px;
+    }
+
+    .entry-list {
+        border-left: 3px solid #2d3b47;
+        padding-left: 10px;
+        margin-bottom: 15px;
+    }
+
+    .entry-title {
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
+
+    .entry-content {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .entry-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .entry-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .mobile-gundem {
+        position: sticky;
+        top: 56px;
+        z-index: 1000;
+        margin: -1rem -0.5rem 0.5rem -0.5rem;
+        background-color: #1d2935;
+        border-bottom: 1px solid #2d3b47;
+    }
+
+    .mobile-gundem .content-section {
+        margin-bottom: 0;
+        border-radius: 0;
+        padding: 8px 12px;
+        background-color: transparent;
+    }
+
+    .mobile-gundem h3 {
+        margin: 0;
+        padding: 8px 0;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #81c14b;
+    }
+
+    .mobile-gundem h3:after {
+        content: '▼';
+        font-size: 10px;
+        transition: transform 0.3s;
+    }
+
+    .mobile-gundem.collapsed h3:after {
+        transform: rotate(-90deg);
+    }
+
+    .mobile-gundem .list-group {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        background-color: #2d3b47;
+    }
+
+    .mobile-gundem.expanded .list-group {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .mobile-gundem .list-group-item {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .mobile-gundem .badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .pagination {
+        margin-top: 15px;
+    }
+
+    .page-link {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .alert {
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        margin: 0 10px;
+    }
+
+    .modal-header {
+        padding: 0.5rem 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        padding: 0.5rem;
+    }
+
+    /* Navbar düzenlemeleri */
+    .navbar-collapse {
+        background-color: #1d2935;
+        padding: 0.5rem;
+        border-bottom: 1px solid #2d3b47;
+    }
+
+    .nav-item {
+        margin: 0.2rem 0;
+    }
+
+    .nav-link {
+        padding: 0.5rem;
+        border-radius: 3px;
+    }
+
+    .nav-link:hover {
+        background-color: #2d3b47;
+    }
+}
+
+/* Tablet Optimizasyonları */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 95%;
+    }
+
+    .entry-title {
+        font-size: 1.1rem;
+    }
+
+    .entry-content {
+        font-size: 0.95rem;
+    }
+
+    .content-section {
+        padding: 15px;
+    }
+}
+
+/* Genel responsive iyileştirmeler */
+.container {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+[class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+@media (min-width: 769px) {
+    .mobile-gundem {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-gundem {
+        display: none;
+    }
+}
+
+/* Gündem container'ı için özel stiller */
+.gundem-container {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+}
+
+.desktop-gundem .content-section,
+.mobile-gundem .content-section {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.desktop-gundem .list-group,
+.mobile-gundem .list-group {
+    width: 100%;
+    max-width: 100%;
+} 
