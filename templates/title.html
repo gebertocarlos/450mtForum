@@ -124,10 +124,11 @@
 
             {% if current_user.is_authenticated %}
                 <div class="new-entry-section mt-4">
-                    <form method="POST">
+                    <form method="POST" id="entryForm">
                         {{ form.hidden_tag() }}
                         <div class="form-group mb-3">
-                            {{ form.content(class="form-control", rows="5", placeholder="bu başlığa bir şeyler yaz...") }}
+                            <div id="editor" style="height: 200px;"></div>
+                            <input type="hidden" name="content" id="hiddenContent">
                             {% if form.content.errors %}
                                 {% for error in form.content.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
@@ -135,7 +136,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            {{ form.submit(class="btn btn-primary") }}
+                            <button type="submit" class="btn btn-primary">gönder</button>
                         </div>
                     </form>
                 </div>
@@ -143,4 +144,28 @@
         </article>
     </div>
 </div>
-{% endblock content %} 
+{% endblock content %}
+
+{% block scripts %}
+<script>
+var quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'bu başlığa bir şeyler yaz...',
+    modules: {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link'],
+            ['clean']
+        ]
+    }
+});
+
+document.getElementById('entryForm').onsubmit = function() {
+    var content = quill.root.innerHTML;
+    document.getElementById('hiddenContent').value = content;
+    return true;
+};
+</script>
+{% endblock %} 
