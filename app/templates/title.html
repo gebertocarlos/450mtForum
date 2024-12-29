@@ -44,7 +44,7 @@
 
             {% for entry in entries.items %}
                 <div class="entry-list mb-4">
-                    <div class="entry-content mt-2">{{ entry.content|safe }}</div>
+                    <div class="entry-content mt-2">{{ entry.content }}</div>
                     <div class="entry-footer mt-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="entry-info">
@@ -52,7 +52,7 @@
                                     {{ entry.author.username }}
                                 </a>
                                 <small class="text-muted">
-                                    {{ entry.local_date_posted.strftime('%d.%m.%Y %H:%M') }}
+                                    {{ entry.date_posted.strftime('%d.%m.%Y %H:%M') }}
                                 </small>
                             </div>
                             <div class="entry-actions">
@@ -124,11 +124,11 @@
 
             {% if current_user.is_authenticated %}
                 <div class="new-entry-section mt-4">
-                    <form method="POST" id="entryForm">
+                    <form method="POST" action="{{ url_for('main.new_entry') }}?title={{ title.title }}">
                         {{ form.hidden_tag() }}
                         <div class="form-group mb-3">
-                            <div id="editor" style="height: 200px;"></div>
-                            <input type="hidden" name="content" id="hiddenContent">
+                            {{ form.content.label(class="form-control-label") }}
+                            {{ form.content(class="form-control", rows="5") }}
                             {% if form.content.errors %}
                                 {% for error in form.content.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
@@ -136,7 +136,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary">gönder</button>
+                            {{ form.submit(class="btn btn-primary") }}
                         </div>
                     </form>
                 </div>
@@ -144,52 +144,4 @@
         </article>
     </div>
 </div>
-{% endblock content %}
-
-{% block scripts %}
-<script>
-var quill = new Quill('#editor', {
-    theme: 'snow',
-    placeholder: 'bu başlığa bir şeyler yaz...',
-    modules: {
-        toolbar: [
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            [{ 'font': [] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'align': [] }],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            ['blockquote', 'code-block'],
-            ['link', 'image', 'video'],
-            ['clean']
-        ]
-    }
-});
-
-document.getElementById('entryForm').onsubmit = function() {
-    var content = quill.root.innerHTML;
-    document.getElementById('hiddenContent').value = content;
-    return true;
-};
-
-// Resim yükleme işlemini özelleştir
-quill.getModule('toolbar').addHandler('image', function() {
-    var input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
-
-    input.onchange = function() {
-        var file = input.files[0];
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            var range = quill.getSelection(true);
-            quill.insertEmbed(range.index, 'image', e.target.result);
-        };
-
-        reader.readAsDataURL(file);
-    };
-});
-</script>
-{% endblock %} 
+{% endblock content %} 

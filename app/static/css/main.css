@@ -23,13 +23,6 @@
     margin-right: 0.75rem;
     filter: brightness(0) invert(1);
     transition: transform 0.3s ease;
-    display: inline-block;
-}
-
-.navbar-logo svg {
-    fill: currentColor;
-    height: 100%;
-    width: 100%;
 }
 
 .navbar-brand:hover .navbar-logo {
@@ -338,28 +331,4 @@ h3 {
 .new-entry-section .form-control:focus {
     border-color: #80bdff;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-/* Quill Editor */
-.ql-toolbar.ql-snow {
-    border-radius: 6px 6px 0 0;
-    border-color: #ced4da;
-    background-color: #f8f9fa;
-}
-
-.ql-container.ql-snow {
-    border-radius: 0 0 6px 6px;
-    border-color: #ced4da;
-    background-color: #fff;
-}
-
-.ql-editor {
-    font-size: 1rem;
-    line-height: 1.6;
-    min-height: 150px;
-}
-
-.ql-editor.ql-blank::before {
-    color: #6c757d;
-    font-style: normal;
 } 

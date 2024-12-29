@@ -1,8 +1,47 @@
-                <div class="entry-list mb-4">
-                    <h2 class="entry-title">
-                        <a href="{{ url_for('main.title', title_name=entry.title_obj.title) }}" class="text-decoration-none">
-                            {{ entry.title_obj.title }}
+{% extends "base.html" %}
+{% block title %}Arama: {{ query }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="content-section">
+            <h2>Arama Sonuçları: "{{ query }}"</h2>
+            {% if titles.items %}
+                <div class="list-group mt-4">
+                    {% for title in titles.items %}
+                        <a href="{{ url_for('main.title', title_name=title.title) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ title.title }}</h5>
+                                <small>{{ title.entry_count }} entry</small>
+                            </div>
+                            <small class="text-muted">{{ title.date_created.strftime('%d.%m.%Y') }}</small>
                         </a>
-                    </h2>
-                    <div class="entry-content mt-2">{{ entry.content|safe }}</div>
-                </div> 
+                    {% endfor %}
+                </div>
+
+                {% if titles.pages > 1 %}
+                    <nav aria-label="Sayfa navigasyonu" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% for page_num in titles.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if titles.page == page_num %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('main.search', q=query, page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info mt-4">
+                    Aramanızla eşleşen sonuç bulunamadı.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %} 

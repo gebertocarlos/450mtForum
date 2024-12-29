@@ -38,13 +38,13 @@
     </div>
     <div class="col-md-9">
         {% for entry in entries.items %}
-            <div class="entry-list mb-4">
-                <h2 class="entry-title">
-                    <a href="{{ url_for('main.title', title_name=entry.title_obj.title) }}" class="text-decoration-none">
+            <div class="entry-list">
+                <div class="entry-metadata">
+                    <a href="{{ url_for('main.title', title_name=entry.title_obj.title) }}" class="entry-title">
                         {{ entry.title_obj.title }}
                     </a>
-                </h2>
-                <div class="entry-content mt-2">{{ entry.content|safe }}</div>
+                </div>
+                <div class="entry-content">{{ entry.content }}</div>
                 <div class="entry-footer">
                     <div class="entry-info">
                         <a href="{{ url_for('main.profile', username=entry.author.username) }}" class="entry-author">

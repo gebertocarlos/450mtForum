@@ -1,91 +1,96 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
+from flask import (Blueprint, render_template, url_for, flash,
+                   redirect, request, abort)
 from flask_login import current_user, login_required
 from app import db
-from app.models import User, Entry, Like, Title
+from app.models import User, Title, Entry
 from app.main.forms import EntryForm, ReplyForm
-from sqlalchemy import func, or_
+from sqlalchemy import func, desc
 
 main = Blueprint('main', __name__)
 
-def get_trending_topics():
-    return db.session.query(
-        Title.title,
-        func.count(Entry.id).label('entry_count')
-    ).join(Entry).group_by(Title.title).order_by(func.count(Entry.id).desc()).limit(10).all()
-
-@main.route('/')
-@main.route('/home')
+@main.route("/")
+@main.route("/home")
 def home():
     page = request.args.get('page', 1, type=int)
-    entries = Entry.query.order_by(Entry.date_posted.desc()).paginate(page=page, per_page=10)
-    trending_topics = get_trending_topics()
+    entries = Entry.query.filter_by(parent_id=None)\
+        .order_by(Entry.date_posted.desc())\
+        .paginate(page=page, per_page=10)
+    trending_topics = Title.query.join(Entry)\
+        .group_by(Title.id)\
+        .order_by(func.count(Entry.id).desc())\
+        .limit(10).all()
     return render_template('home.html', entries=entries, trending_topics=trending_topics)
 
-@main.route('/entry/new', methods=['GET', 'POST'])
+@main.route("/popular")
+def popular():
+    page = request.args.get('page', 1, type=int)
+    entries = Entry.query.join(Entry.likes)\
+        .group_by(Entry.id)\
+        .order_by(func.count(Entry.likes).desc())\
+        .paginate(page=page, per_page=10)
+    trending_topics = Title.query.join(Entry)\
+        .group_by(Title.id)\
+        .order_by(func.count(Entry.id).desc())\
+        .limit(10).all()
+    return render_template('home.html', entries=entries, trending_topics=trending_topics)
+
+@main.route("/user/<string:username>")
+def profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    entries = Entry.query.filter_by(author=user)\
+        .order_by(Entry.date_posted.desc())\
+        .paginate(page=page, per_page=10)
+    return render_template('profile.html', user=user, entries=entries)
+
+@main.route("/title/<string:title_name>")
+def title(title_name):
+    title = Title.query.filter_by(title=title_name).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    entries = Entry.query.filter_by(title_id=title.id)\
+        .order_by(Entry.date_posted.desc())\
+        .paginate(page=page, per_page=10)
+    trending_topics = Title.query.join(Entry)\
+        .group_by(Title.id)\
+        .order_by(func.count(Entry.id).desc())\
+        .limit(10).all()
+    form = EntryForm() if current_user.is_authenticated else None
+    return render_template('title.html', title=title, entries=entries,
+                         trending_topics=trending_topics, form=form)
+
+@main.route("/entry/new", methods=['GET', 'POST'])
 @login_required
 def new_entry():
     form = EntryForm()
-    title_name = request.args.get('title')
-    
-    if title_name:
-        title = Title.query.filter_by(title=title_name).first()
-        if title and request.method == 'GET':
-            form.title.data = title.title
-    
     if form.validate_on_submit():
-        # Başlık parametresi varsa onu kullan, yoksa formdan al
-        if title_name:
-            title = Title.query.filter_by(title=title_name).first()
-        else:
-            title = Title.query.filter_by(title=form.title.data).first()
-            
-        if not title and form.title.data:
-            title = Title(title=form.title.data)
+        title_text = request.args.get('title', form.title.data)
+        title = Title.query.filter_by(title=title_text).first()
+        if not title:
+            title = Title(title=title_text)
             db.session.add(title)
             db.session.commit()
-        
-        if title:
-            entry = Entry(content=form.content.data, author=current_user, title_obj=title)
-            db.session.add(entry)
-            db.session.commit()
-            flash('Entry başarıyla oluşturuldu!', 'success')
-            return redirect(url_for('main.title', title_name=title.title))
-        else:
-            flash('Lütfen bir başlık girin veya mevcut başlık seçin.', 'danger')
-            
-    trending_topics = get_trending_topics()
+        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
+        db.session.add(entry)
+        db.session.commit()
+        flash('Entry başarıyla oluşturuldu!', 'success')
+        return redirect(url_for('main.title', title_name=title.title))
+    elif request.args.get('title'):
+        form.title.data = request.args.get('title')
     return render_template('create_entry.html', title='Yeni Entry',
-                         form=form, legend='Yeni Entry', trending_topics=trending_topics)
+                         form=form, legend='Yeni Entry')
 
-@main.route('/title/<string:title_name>', methods=['GET', 'POST'])
-def title(title_name):
-    page = request.args.get('page', 1, type=int)
-    title = Title.query.filter_by(title=title_name).first_or_404()
-    form = EntryForm()
-    form.title.data = title.title
-    
-    if current_user.is_authenticated and request.method == 'POST':
-        if form.validate_on_submit():
-            entry = Entry(content=form.content.data, author=current_user, title_obj=title)
-            db.session.add(entry)
-            db.session.commit()
-            flash('Entry başarıyla eklendi!', 'success')
-            return redirect(url_for('main.title', title_name=title.title))
-        
-    entries = Entry.query.filter_by(title_id=title.id)\
-        .order_by(Entry.date_posted.asc())\
-        .paginate(page=page, per_page=10)
-    trending_topics = get_trending_topics()
-    return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics, form=form)
-
-@main.route('/entry/<int:entry_id>', methods=['GET'])
+@main.route("/entry/<int:entry_id>")
 def entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
-    form = ReplyForm()
-    trending_topics = get_trending_topics()
-    return render_template('entry.html', title=entry.title_obj.title, entry=entry, form=form, trending_topics=trending_topics)
+    trending_topics = Title.query.join(Entry)\
+        .group_by(Title.id)\
+        .order_by(func.count(Entry.id).desc())\
+        .limit(10).all()
+    form = ReplyForm() if current_user.is_authenticated else None
+    return render_template('entry.html', entry=entry,
+                         trending_topics=trending_topics, form=form)
 
-@main.route('/entry/<int:entry_id>/update', methods=['GET', 'POST'])
+@main.route("/entry/<int:entry_id>/update", methods=['GET', 'POST'])
 @login_required
 def update_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
@@ -93,121 +98,38 @@ def update_entry(entry_id):
         abort(403)
     form = EntryForm()
     if form.validate_on_submit():
-        # Başlığı güncelleme
-        title = Title.query.filter_by(title=form.title.data).first()
-        if not title:
-            title = Title(title=form.title.data)
-            db.session.add(title)
-            db.session.commit()
-        
-        entry.title_obj = title
         entry.content = form.content.data
         db.session.commit()
         flash('Entry başarıyla güncellendi!', 'success')
         return redirect(url_for('main.entry', entry_id=entry.id))
     elif request.method == 'GET':
-        form.title.data = entry.title_obj.title
         form.content.data = entry.content
-    trending_topics = get_trending_topics()
+        if not entry.parent:
+            form.title.data = entry.title_obj.title
     return render_template('create_entry.html', title='Entry Güncelle',
-                         form=form, legend='Entry Güncelle', trending_topics=trending_topics)
+                         form=form, legend='Entry Güncelle')
 
-@main.route('/entry/<int:entry_id>/delete', methods=['POST'])
+@main.route("/entry/<int:entry_id>/delete", methods=['POST'])
 @login_required
 def delete_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
     if entry.author != current_user:
         abort(403)
-    
-    # Önce entry'nin beğenilerini sil
-    Like.query.filter_by(entry_id=entry.id).delete()
-    
-    # Entry'yi sil
-    title = entry.title_obj
     db.session.delete(entry)
     db.session.commit()
-
-    # Başlık altında başka entry kalmadıysa başlığı da sil
-    remaining_entries = Entry.query.filter_by(title_id=title.id).count()
-    if remaining_entries == 0:
-        db.session.delete(title)
-        db.session.commit()
-        flash('Entry ve başlık başarıyla silindi!', 'success')
-        return redirect(url_for('main.home'))
-    
     flash('Entry başarıyla silindi!', 'success')
-    return redirect(url_for('main.title', title_name=title.title))
+    return redirect(url_for('main.home'))
 
-@main.route('/user/<string:username>')
-def profile(username):
-    page = request.args.get('page', 1, type=int)
-    user = User.query.filter_by(username=username).first_or_404()
-    entries = Entry.query.filter_by(author=user)\
-        .order_by(Entry.date_posted.desc())\
-        .paginate(page=page, per_page=10)
-    trending_topics = get_trending_topics()
-    return render_template('profile.html', entries=entries, user=user, trending_topics=trending_topics)
-
-@main.route('/entry/<int:entry_id>/like', methods=['POST'])
+@main.route("/entry/<int:entry_id>/like", methods=['POST'])
 @login_required
 def like_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
-    like = Like.query.filter_by(user_id=current_user.id, entry_id=entry.id).first()
-    
-    if like:
-        db.session.delete(like)
+    if current_user in entry.likes:
+        entry.likes.remove(current_user)
     else:
-        like = Like(user_id=current_user.id, entry_id=entry.id)
-        db.session.add(like)
-    
+        entry.likes.append(current_user)
     db.session.commit()
     return redirect(request.referrer)
-
-@main.route('/search')
-def search():
-    query = request.args.get('q', '')
-    page = request.args.get('page', 1, type=int)
-    
-    if query:
-        # Yazar araması (@kullanıcı_adı)
-        if query.startswith('@'):
-            username = query[1:]
-            user = User.query.filter(User.username.contains(username)).first()
-            if user:
-                return redirect(url_for('main.profile', username=user.username))
-            else:
-                entries = Entry.query.join(Title).filter(Title.title.contains(query)).paginate(page=page, per_page=10)
-        # Entry araması (#entry_id)
-        elif query.startswith('#'):
-            try:
-                entry_id = int(query[1:])
-                entry = Entry.query.get(entry_id)
-                if entry:
-                    return redirect(url_for('main.entry', entry_id=entry.id))
-            except ValueError:
-                pass
-            entries = Entry.query.join(Title).filter(Title.title.contains(query)).paginate(page=page, per_page=10)
-        # Normal arama (başlık ve içerik)
-        else:
-            entries = Entry.query.join(Title).join(User).filter(
-                or_(
-                    Title.title.contains(query),
-                    Entry.content.contains(query),
-                    User.username.contains(query)
-                )
-            ).order_by(Entry.date_posted.desc()).paginate(page=page, per_page=10)
-    else:
-        entries = Entry.query.order_by(Entry.date_posted.desc()).paginate(page=page, per_page=10)
-    
-    trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, search_query=query, trending_topics=trending_topics)
-
-@main.route('/popular')
-def popular():
-    page = request.args.get('page', 1, type=int)
-    entries = Entry.query.join(Like).group_by(Entry.id).order_by(func.count(Like.id).desc()).paginate(page=page, per_page=10)
-    trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, trending_topics=trending_topics)
 
 @main.route("/entry/<int:entry_id>/reply", methods=['POST'])
 @login_required
@@ -215,13 +137,44 @@ def reply_entry(entry_id):
     parent_entry = Entry.query.get_or_404(entry_id)
     form = ReplyForm()
     if form.validate_on_submit():
-        reply = Entry(
-            title_obj=parent_entry.title_obj,
-            content=form.content.data,
-            author=current_user,
-            parent_id=entry_id
-        )
+        reply = Entry(content=form.content.data,
+                     author=current_user,
+                     title_obj=parent_entry.title_obj,
+                     parent=parent_entry)
         db.session.add(reply)
         db.session.commit()
         flash('Cevabınız başarıyla eklendi!', 'success')
-    return redirect(url_for('main.entry', entry_id=entry_id)) 
+    return redirect(url_for('main.entry', entry_id=entry_id))
+
+@main.route("/search")
+def search():
+    query = request.args.get('q', '')
+    page = request.args.get('page', 1, type=int)
+    
+    if query.startswith('@'):
+        username = query[1:]
+        user = User.query.filter_by(username=username).first()
+        if user:
+            return redirect(url_for('main.profile', username=username))
+        else:
+            flash('Kullanıcı bulunamadı.', 'warning')
+            return redirect(url_for('main.home'))
+    
+    elif query.startswith('#'):
+        try:
+            entry_id = int(query[1:])
+            entry = Entry.query.get(entry_id)
+            if entry:
+                return redirect(url_for('main.entry', entry_id=entry_id))
+            else:
+                flash('Entry bulunamadı.', 'warning')
+                return redirect(url_for('main.home'))
+        except ValueError:
+            flash('Geçersiz entry ID.', 'warning')
+            return redirect(url_for('main.home'))
+    
+    else:
+        titles = Title.query.filter(Title.title.ilike(f'%{query}%'))\
+            .order_by(Title.title)\
+            .paginate(page=page, per_page=10)
+        return render_template('search.html', titles=titles, query=query) 

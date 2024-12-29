@@ -5,10 +5,10 @@ from app.models import User
 
 class RegistrationForm(FlaskForm):
     username = StringField('Kullanıcı Adı',
-                         validators=[DataRequired(), Length(min=3, max=20)])
-    email = StringField('Email',
+                         validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('E-posta',
                        validators=[DataRequired(), Email()])
-    password = PasswordField('Şifre', validators=[DataRequired(), Length(min=6)])
+    password = PasswordField('Şifre', validators=[DataRequired()])
     confirm_password = PasswordField('Şifreyi Onayla',
                                    validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Kayıt Ol')
@@ -21,27 +21,27 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError('Bu email adresi zaten kullanımda. Lütfen başka bir tane seçin.')
+            raise ValidationError('Bu e-posta adresi zaten kayıtlı. Lütfen başka bir tane kullanın.')
 
 class LoginForm(FlaskForm):
-    email = StringField('Email',
+    email = StringField('E-posta',
                        validators=[DataRequired(), Email()])
     password = PasswordField('Şifre', validators=[DataRequired()])
     remember = BooleanField('Beni Hatırla')
     submit = SubmitField('Giriş Yap')
 
 class RequestResetForm(FlaskForm):
-    email = StringField('Email',
+    email = StringField('E-posta',
                        validators=[DataRequired(), Email()])
-    submit = SubmitField('Şifre Sıfırlama İsteği Gönder')
+    submit = SubmitField('Şifre Sıfırlama İste')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is None:
-            raise ValidationError('Bu email adresiyle kayıtlı bir hesap bulunamadı.')
+            raise ValidationError('Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.')
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Yeni Şifre', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Yeni Şifreyi Onayla',
+    password = PasswordField('Şifre', validators=[DataRequired()])
+    confirm_password = PasswordField('Şifreyi Onayla',
                                    validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Şifreyi Sıfırla') 
