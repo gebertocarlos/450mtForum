@@ -17,9 +17,11 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
     app.register_blueprint(main)
 
-    @app.before_first_request
-    def create_tables():
-        db.create_all()
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"Veritabanı oluşturma hatası: {e}")
 
     return app
 
