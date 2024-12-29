@@ -38,8 +38,9 @@ def new_entry():
 @main.route('/entry/<int:entry_id>')
 def entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
+    form = EntryForm()
     trending_topics = get_trending_topics()
-    return render_template('entry.html', title=entry.title, entry=entry, trending_topics=trending_topics)
+    return render_template('entry.html', title=entry.title, entry=entry, form=form, trending_topics=trending_topics)
 
 @main.route('/entry/<int:entry_id>/update', methods=['GET', 'POST'])
 @login_required
@@ -141,4 +142,21 @@ def popular():
     page = request.args.get('page', 1, type=int)
     entries = Entry.query.join(Like).group_by(Entry.id).order_by(func.count(Like.id).desc()).paginate(page=page, per_page=10)
     trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, trending_topics=trending_topics) 
+    return render_template('home.html', entries=entries, trending_topics=trending_topics)
+
+@main.route('/entry/<int:entry_id>/reply', methods=['POST'])
+@login_required
+def reply_entry(entry_id):
+    parent_entry = Entry.query.get_or_404(entry_id)
+    form = EntryForm()
+    if form.validate_on_submit():
+        reply = Entry(
+            title=parent_entry.title,
+            content=form.content.data,
+            author=current_user,
+            parent_id=entry_id
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Yanıtınız başarıyla gönderildi!', 'success')
+    return redirect(url_for('main.entry', entry_id=entry_id)) 

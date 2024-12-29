@@ -19,9 +19,9 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row g-0">
     <!-- Desktop Gündem -->
-    <div class="col-md-4 desktop-gundem">
+    <div class="col-md-3 desktop-gundem pe-md-3">
         <div class="content-section">
             <h3>gündem</h3>
             <ul class="list-group">
@@ -36,7 +36,7 @@
             </ul>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-9">
         <article class="content-section">
             <div class="entry-metadata">
                 <h1 class="entry-title mb-3">{{ entry.title }}</h1>
@@ -60,20 +60,120 @@
                 </div>
             </div>
             <div class="entry-content mt-3">{{ entry.content }}</div>
-            <div class="mt-3">
-                {% if current_user.is_authenticated %}
-                    <form action="{{ url_for('main.like_entry', entry_id=entry.id) }}" method="POST" class="d-inline">
-                        <button type="submit" class="btn btn-sm {% if current_user in entry.likes %}btn-primary{% else %}btn-outline-light{% endif %}">
+            <div class="mt-3 d-flex justify-content-between align-items-center">
+                <div>
+                    {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('main.like_entry', entry_id=entry.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm {% if current_user in entry.likes %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                <i class="fas fa-heart"></i> {{ entry.likes|length }}
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="text-muted">
                             <i class="fas fa-heart"></i> {{ entry.likes|length }}
-                        </button>
-                    </form>
-                {% else %}
-                    <span class="text-muted">
-                        <i class="fas fa-heart"></i> {{ entry.likes|length }}
-                    </span>
+                        </span>
+                    {% endif %}
+                </div>
+                {% if current_user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-light reply-button" onclick="toggleReplyForm('{{ entry.id }}')">
+                        <i class="fas fa-reply"></i> yanıtla
+                    </button>
                 {% endif %}
             </div>
         </article>
+
+        <!-- Yanıt Formu -->
+        {% if current_user.is_authenticated %}
+            <div id="replyForm-{{ entry.id }}" class="content-section mt-3" style="display: none;">
+                <form method="POST" action="{{ url_for('main.reply_entry', entry_id=entry.id) }}">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows="5") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows="5") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <button type="button" class="btn btn-secondary" onclick="toggleReplyForm('{{ entry.id }}')">iptal</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        <!-- Yanıtlar -->
+        {% if entry.replies.count() > 0 %}
+            <div class="replies mt-4">
+                <h4 class="mb-3">Yanıtlar</h4>
+                {% for reply in entry.replies %}
+                    <div class="content-section">
+                        <div class="entry-metadata">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-muted">
+                                    <a href="{{ url_for('main.profile', username=reply.author.username) }}" class="text-decoration-none">
+                                        {{ reply.author.username }}
+                                    </a>
+                                    tarafından {{ reply.date_posted.strftime('%d.%m.%Y %H:%M') }}
+                                </div>
+                                {% if reply.author == current_user %}
+                                    <div>
+                                        <a class="btn btn-sm btn-secondary" href="{{ url_for('main.update_entry', entry_id=reply.id) }}">
+                                            <i class="fas fa-edit"></i> düzenle
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ reply.id }}">
+                                            <i class="fas fa-trash"></i> sil
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="entry-content mt-3">{{ reply.content }}</div>
+                        <div class="mt-3">
+                            {% if current_user.is_authenticated %}
+                                <form action="{{ url_for('main.like_entry', entry_id=reply.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm {% if current_user in reply.likes %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                        <i class="fas fa-heart"></i> {{ reply.likes|length }}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted">
+                                    <i class="fas fa-heart"></i> {{ reply.likes|length }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if reply.author == current_user %}
+                        <div class="modal fade" id="deleteModal-{{ reply.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">yanıtı sil</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        bu yanıtı silmek istediğinizden emin misiniz?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">iptal</button>
+                                        <form action="{{ url_for('main.delete_entry', entry_id=reply.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-danger">sil</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </div>
 
@@ -98,4 +198,17 @@
         </div>
     </div>
 {% endif %}
-{% endblock content %} 
+{% endblock content %}
+
+{% block scripts %}
+<script>
+function toggleReplyForm(entryId) {
+    const form = document.getElementById(`replyForm-${entryId}`);
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
+{% endblock scripts %} 
