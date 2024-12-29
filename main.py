@@ -65,7 +65,10 @@ def title(title_name):
         .order_by(Entry.date_posted.asc())\
         .paginate(page=page, per_page=10)
     trending_topics = get_trending_topics()
-    return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics)
+    form = EntryForm()
+    if title:
+        form.title.data = title.title
+    return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics, form=form)
 
 @main.route('/entry/<int:entry_id>', methods=['GET'])
 def entry(entry_id):

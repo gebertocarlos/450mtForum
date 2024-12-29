@@ -23,6 +23,13 @@
     margin-right: 0.75rem;
     filter: brightness(0) invert(1);
     transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.navbar-logo svg {
+    fill: currentColor;
+    height: 100%;
+    width: 100%;
 }
 
 .navbar-brand:hover .navbar-logo {
