@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from config import Config
-from extensions import db, bcrypt, login_manager
+from extensions import db, bcrypt, login_manager, mail
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -13,6 +13,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
     migrate = Migrate(app, db)
 
     from main import main

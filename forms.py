@@ -37,4 +37,20 @@ class EntryForm(FlaskForm):
 
 class ReplyForm(FlaskForm):
     content = TextAreaField('Cevabınız', validators=[DataRequired(), Length(min=10)])
-    submit = SubmitField('Cevapla') 
+    submit = SubmitField('Cevapla')
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email',
+                       validators=[DataRequired(), Email()])
+    submit = SubmitField('Şifre Sıfırlama İsteği Gönder')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('Bu email adresiyle kayıtlı bir hesap bulunamadı.')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Yeni Şifre', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Yeni Şifreyi Onayla',
+                                   validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Şifreyi Sıfırla') 

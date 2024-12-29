@@ -1,6 +1,8 @@
 from datetime import datetime
 from flask_login import UserMixin
 from extensions import db, login_manager
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask import current_app
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -14,6 +16,19 @@ class User(UserMixin, db.Model):
     date_joined = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     entries = db.relationship('Entry', backref='author', lazy=True)
     likes = db.relationship('Like', backref='user', lazy=True)
+
+    def get_reset_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
