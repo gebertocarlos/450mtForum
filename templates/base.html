@@ -1,57 +1,81 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>450mt Forum - {% block title %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>450MT Forum - {% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- Ana CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid px-3">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.home') }}">
-                <img src="{{ url_for('static', filename='images/Dirt-Bike-Silhouette.svg') }}" alt="Dirt Bike" class="me-2" style="height: 30px; width: auto;">
-                450mt Forum
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.popular') }}">
-                            <i class="fas fa-fire"></i> en beğenilenler
-                        </a>
-                    </li>
-                </ul>
-                <form class="search-form mx-auto" method="GET" action="{{ url_for('main.search') }}">
-                    <input class="search-input" type="search" placeholder="başlık, #entry, @yazar" name="q">
-                    <button class="btn btn-outline-light btn-sm" type="submit">ara</button>
-                </form>
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('main.home') }}">
+                    450MT Forum
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.home') }}">
+                                <i class="fas fa-home"></i> ana sayfa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.popular') }}">
+                                <i class="fas fa-fire"></i> popüler
+                            </a>
+                        </li>
+                        {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.new_entry') }}">
                                 <i class="fas fa-plus"></i> yeni entry
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.profile', username=current_user.username) }}">
+                        {% endif %}
+                    </ul>
+                    <form class="d-flex me-3" action="{{ url_for('main.search') }}" method="get">
+                        <div class="input-group">
+                            <input class="form-control" type="search" name="q" placeholder="başlık, #entry_id veya @yazar">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <ul class="navbar-nav">
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user"></i> {{ current_user.username }}
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.profile', username=current_user.username) }}">
+                                        <i class="fas fa-user-circle"></i> profil
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ url_for('auth.logout') }}" method="POST" class="d-inline">
+                                        <button class="dropdown-item text-danger" type="submit">
+                                            <i class="fas fa-sign-out-alt"></i> çıkış yap
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                                <i class="fas fa-sign-out-alt"></i> çıkış
-                            </a>
-                        </li>
-                    {% else %}
+                        {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.login') }}">
-                                <i class="fas fa-sign-in-alt"></i> giriş
+                                <i class="fas fa-sign-in-alt"></i> giriş yap
                             </a>
                         </li>
                         <li class="nav-item">
@@ -59,13 +83,14 @@
                                 <i class="fas fa-user-plus"></i> kayıt ol
                             </a>
                         </li>
-                    {% endif %}
-                </ul>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <main class="container-fluid px-3 mt-5 pt-4">
+    <main class="container py-4 mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -79,21 +104,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileGundem = document.querySelector('.mobile-gundem');
-            if (mobileGundem) {
-                const gundemHeader = mobileGundem.querySelector('h3');
-                gundemHeader.addEventListener('click', function() {
-                    mobileGundem.classList.toggle('expanded');
-                    mobileGundem.classList.toggle('collapsed');
-                });
-                // Başlangıçta kapalı olsun
-                mobileGundem.classList.add('collapsed');
-            }
-        });
-    </script>
-    {% block scripts %}{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
