@@ -17,14 +17,15 @@
     opacity: 0.9;
 }
 
-.navbar-brand img {
-    height: 30px;
+.navbar-logo {
+    height: 35px;
     width: auto;
     margin-right: 0.75rem;
+    filter: brightness(0) invert(1);
     transition: transform 0.3s ease;
 }
 
-.navbar-brand:hover img {
+.navbar-brand:hover .navbar-logo {
     transform: scale(1.1);
 }
 
@@ -307,4 +308,27 @@ h3 {
 .profile-info {
     color: #6c757d;
     font-size: 0.9rem;
+}
+
+/* Yeni Entry Form */
+.new-entry-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.new-entry-section form {
+    margin-bottom: 0;
+}
+
+.new-entry-section .form-control {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+}
+
+.new-entry-section .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 } 

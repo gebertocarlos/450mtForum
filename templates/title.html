@@ -123,10 +123,22 @@
             {% endif %}
 
             {% if current_user.is_authenticated %}
-                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
-                    <a href="{{ url_for('main.new_entry') }}?title={{ title.title }}" class="btn btn-primary rounded-circle shadow-lg" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-plus fa-lg"></i>
-                    </a>
+                <div class="new-entry-section mt-4">
+                    <form method="POST" action="{{ url_for('main.new_entry') }}?title={{ title.title }}">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            {{ form.content.label(class="form-control-label") }}
+                            {{ form.content(class="form-control", rows="5") }}
+                            {% if form.content.errors %}
+                                {% for error in form.content.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
                 </div>
             {% endif %}
         </article>
