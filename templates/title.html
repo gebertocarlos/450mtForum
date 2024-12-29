@@ -81,19 +81,20 @@
                 </div>
 
                 {% if entry.author == current_user %}
-                    <div class="modal fade" id="deleteModal{{ entry.id }}" tabindex="-1">
+                    <!-- Entry Silme Modal -->
+                    <div class="modal fade" id="deleteModal{{ entry.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ entry.id }}" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">entry'yi sil</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <h5 class="modal-title" id="deleteModalLabel{{ entry.id }}">entry'yi sil</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
                                 </div>
                                 <div class="modal-body">
                                     bu entry'yi silmek istediğinizden emin misiniz?
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">iptal</button>
-                                    <form action="{{ url_for('main.delete_entry', entry_id=entry.id) }}" method="POST">
+                                    <form action="{{ url_for('main.delete_entry', entry_id=entry.id) }}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-danger">sil</button>
                                     </form>
                                 </div>

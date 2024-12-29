@@ -107,12 +107,18 @@ def delete_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
     if entry.author != current_user:
         abort(403)
+    
+    # Önce entry'nin beğenilerini sil
+    Like.query.filter_by(entry_id=entry.id).delete()
+    
+    # Entry'yi sil
     title = entry.title_obj
     db.session.delete(entry)
     db.session.commit()
 
     # Başlık altında başka entry kalmadıysa başlığı da sil
-    if len(title.entries) == 0:
+    remaining_entries = Entry.query.filter_by(title_id=title.id).count()
+    if remaining_entries == 0:
         db.session.delete(title)
         db.session.commit()
         flash('Entry ve başlık başarıyla silindi!', 'success')
