@@ -9,11 +9,11 @@
             
             {% if current_user.is_authenticated %}
                 <div class="new-entry-section mt-4">
-                    <form method="POST" action="{{ url_for('main.new_entry') }}?title={{ title.title }}">
+                    <form method="POST" action="">
                         {{ form.hidden_tag() }}
                         <div class="form-group mb-3">
                             {{ form.content.label(class="form-control-label") }}
-                            {{ form.content(class="form-control", rows="5") }}
+                            {{ form.content(class="form-control", rows="5", placeholder="Bu başlık için bir entry yazın...") }}
                             {% if form.content.errors %}
                                 {% for error in form.content.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>

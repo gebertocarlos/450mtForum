@@ -1,3 +1,17 @@
+/* Genel Stiller */
+body {
+    background-color: #f8f9fa;
+}
+
+.content-section {
+    background: #ffffff;
+    padding: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
 /* Navbar ve Logo */
 .navbar {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -29,306 +43,93 @@
     transform: scale(1.1);
 }
 
-/* Genel Stiller */
-body {
-    background-color: #f8f9fa;
-    color: #212529;
-}
-
-/* Container ve İçerik */
-.content-section {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-}
-
-/* Başlıklar */
-h1, h2, h3 {
-    color: #343a40;
-    margin-bottom: 1rem;
-}
-
-h3 {
-    font-size: 1.5rem;
-    font-weight: 500;
-}
-
-/* Gündem */
-.list-group-item {
-    border: none;
-    padding: 12px 15px;
-    margin-bottom: 5px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.list-group-item:hover {
-    background-color: #e9ecef;
-}
-
-.list-group-item a {
-    color: #495057;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.badge {
-    background-color: #6c757d;
-    color: #fff;
-    font-weight: 500;
-    padding: 5px 10px;
-}
-
-/* Entry'ler */
+/* Entry Stiller */
 .entry-list {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
+}
+
+.entry-metadata {
+    margin-bottom: 1rem;
 }
 
 .entry-title {
-    color: #343a40;
-    font-size: 1.75rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
+    color: #007bff;
+    font-size: 1.25rem;
     text-decoration: none;
+    font-weight: 500;
 }
 
 .entry-title:hover {
-    color: #007bff;
-}
-
-.entry-content {
-    color: #212529;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.entry-footer {
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
+    color: #0056b3;
+    text-decoration: none;
 }
 
 .entry-info {
+    margin-top: 0.5rem;
     font-size: 0.9rem;
 }
 
-.entry-info a {
-    color: #6c757d;
-    text-decoration: none;
-    font-weight: 500;
+.entry-content {
+    margin: 1rem 0;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-.entry-info a:hover {
-    color: #007bff;
+.entry-footer {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e3e3e3;
 }
 
 .entry-actions {
     display: flex;
-    gap: 8px;
-    align-items: center;
+    gap: 0.5rem;
 }
 
-/* Butonlar */
-.btn {
-    padding: 6px 12px;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.btn-sm {
-    padding: 4px 8px;
-    font-size: 0.875rem;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-.btn-outline-light {
-    color: #6c757d;
-    border-color: #ced4da;
-}
-
-.btn-outline-light:hover {
-    background-color: #f8f9fa;
-    color: #495057;
-    border-color: #6c757d;
-}
-
-/* Mobil Görünüm */
-@media (max-width: 768px) {
-    .desktop-gundem {
-        display: none;
-    }
-    
-    .mobile-gundem {
-        display: block;
-        margin-bottom: 20px;
-    }
-}
-
-@media (min-width: 769px) {
-    .mobile-gundem {
-        display: none;
-    }
-}
-
-/* Formlar */
-.form-control {
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    padding: 8px 12px;
-}
-
+/* Form Stiller */
 .form-control:focus {
     border-color: #80bdff;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 }
 
-/* Yeni Entry Ekle Butonu */
-.floating-action-button {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #007bff;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-    z-index: 1000;
-}
-
-.floating-action-button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-}
-
-/* Pagination */
-.pagination {
-    margin-top: 2rem;
-}
-
-.page-link {
-    color: #007bff;
-    border: none;
-    padding: 8px 16px;
-    margin: 0 4px;
-    border-radius: 6px;
-}
-
-.page-link:hover {
-    background-color: #e9ecef;
-    color: #0056b3;
-}
-
-.page-item.active .page-link {
-    background-color: #007bff;
-    color: #fff;
-}
-
-/* Flash Mesajları */
-.alert {
-    border-radius: 6px;
-    border: none;
-    padding: 12px 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Modal */
-.modal-content {
-    border-radius: 8px;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.modal-header {
-    border-bottom: 1px solid #e9ecef;
-    padding: 1rem 1.5rem;
-}
-
-.modal-footer {
-    border-top: 1px solid #e9ecef;
-    padding: 1rem 1.5rem;
-}
-
-.modal-title {
-    font-weight: 500;
-}
-
-/* Profil Sayfası */
-.profile-section {
-    text-align: center;
-    padding: 2rem;
-}
-
-.profile-img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-bottom: 1rem;
-}
-
-.profile-username {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.profile-info {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-/* Yeni Entry Form */
-.new-entry-section {
+.btn-outline-light:hover {
+    color: #000;
     background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 2rem;
+    border-color: #f8f9fa;
 }
 
-.new-entry-section form {
-    margin-bottom: 0;
+/* Gündem Stiller */
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1.25rem;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
 }
 
-.new-entry-section .form-control {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    transition: all 0.2s ease;
+.list-group-item:hover {
+    background-color: #f8f9fa;
 }
 
-.new-entry-section .form-control:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+.list-group-item a {
+    color: #495057;
+    text-decoration: none;
+}
+
+.list-group-item a:hover {
+    color: #007bff;
+}
+
+/* Responsive Stiller */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .navbar-logo {
+        height: 30px;
+    }
+
+    .content-section {
+        padding: 15px;
+    }
 } 

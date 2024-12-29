@@ -43,7 +43,7 @@ def profile(username):
         .paginate(page=page, per_page=10)
     return render_template('profile.html', user=user, entries=entries)
 
-@main.route("/title/<string:title_name>")
+@main.route("/title/<string:title_name>", methods=['GET', 'POST'])
 def title(title_name):
     title = Title.query.filter_by(title=title_name).first_or_404()
     page = request.args.get('page', 1, type=int)
@@ -54,7 +54,15 @@ def title(title_name):
         .group_by(Title.id)\
         .order_by(func.count(Entry.id).desc())\
         .limit(10).all()
+    
     form = EntryForm() if current_user.is_authenticated else None
+    if form and form.validate_on_submit():
+        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
+        db.session.add(entry)
+        db.session.commit()
+        flash('Entry başarıyla eklendi!', 'success')
+        return redirect(url_for('main.title', title_name=title.title))
+        
     return render_template('title.html', title=title, entries=entries,
                          trending_topics=trending_topics, form=form)
 
@@ -64,18 +72,22 @@ def new_entry():
     form = EntryForm()
     if form.validate_on_submit():
         title_text = request.args.get('title', form.title.data)
+        if not title_text:
+            flash('Lütfen bir başlık girin.', 'danger')
+            return redirect(url_for('main.new_entry'))
+            
         title = Title.query.filter_by(title=title_text).first()
         if not title:
             title = Title(title=title_text)
             db.session.add(title)
             db.session.commit()
+            
         entry = Entry(content=form.content.data, author=current_user, title_obj=title)
         db.session.add(entry)
         db.session.commit()
         flash('Entry başarıyla oluşturuldu!', 'success')
         return redirect(url_for('main.title', title_name=title.title))
-    elif request.args.get('title'):
-        form.title.data = request.args.get('title')
+        
     return render_template('create_entry.html', title='Yeni Entry',
                          form=form, legend='Yeni Entry')
 

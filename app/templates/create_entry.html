@@ -9,32 +9,30 @@
                 {{ form.hidden_tag() }}
                 <fieldset class="form-group">
                     <legend class="border-bottom mb-4">{{ legend }}</legend>
-                    {% if not form.title.data %}
-                        <div class="form-group mb-3">
-                            {{ form.title.label(class="form-control-label") }}
-                            {% if form.title.errors %}
-                                {{ form.title(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.title.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.title(class="form-control") }}
-                            {% endif %}
-                        </div>
-                    {% endif %}
+                    <div class="form-group mb-3">
+                        {{ form.title.label(class="form-control-label") }}
+                        {% if form.title.errors %}
+                            {{ form.title(class="form-control is-invalid", placeholder="Yeni bir başlık girin...") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.title(class="form-control", placeholder="Yeni bir başlık girin...") }}
+                        {% endif %}
+                    </div>
                     <div class="form-group mb-3">
                         {{ form.content.label(class="form-control-label") }}
                         {% if form.content.errors %}
-                            {{ form.content(class="form-control is-invalid", rows="10") }}
+                            {{ form.content(class="form-control is-invalid", rows="10", placeholder="Başlık için ilk entry'yi yazın...") }}
                             <div class="invalid-feedback">
                                 {% for error in form.content.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.content(class="form-control", rows="10") }}
+                            {{ form.content(class="form-control", rows="10", placeholder="Başlık için ilk entry'yi yazın...") }}
                         {% endif %}
                     </div>
                 </fieldset>

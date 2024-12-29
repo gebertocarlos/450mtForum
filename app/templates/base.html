@@ -27,6 +27,13 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.popular') }}">Popüler</a>
                         </li>
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('main.new_entry') }}">
+                                    <i class="fas fa-plus"></i> Yeni Başlık
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                     <form class="d-flex me-3" action="{{ url_for('main.search') }}" method="GET">
                         <input class="form-control me-2" type="search" name="q" placeholder="Başlık, @kullanıcı veya #entry ara">
