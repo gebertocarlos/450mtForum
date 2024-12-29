@@ -12,4 +12,11 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false 
+        fromDatabase:
+          name: 450mtforum_db
+          property: connectionString
+
+  - type: postgres
+    name: 450mtforum_db
+    ipAllowList: []
+    plan: free 
