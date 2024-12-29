@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
+from flask import Blueprint, render_template, url_for, flash, redirect, request, abort, current_app
 from flask_login import current_user, login_required
 from extensions import db
 from models import User, Entry, Like
@@ -6,6 +6,10 @@ from forms import EntryForm
 from sqlalchemy import func, or_
 
 main = Blueprint('main', __name__)
+
+@main.before_app_first_request
+def create_tables():
+    db.create_all()
 
 def get_trending_topics():
     return db.session.query(
