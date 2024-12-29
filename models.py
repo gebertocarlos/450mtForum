@@ -35,7 +35,7 @@ class User(UserMixin, db.Model):
 
 class Title(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), unique=True, nullable=False)
+    title = db.Column(db.Text, unique=True, nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     entries = db.relationship('Entry', backref='title_obj', lazy=True)
 

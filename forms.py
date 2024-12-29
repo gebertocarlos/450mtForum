@@ -32,7 +32,7 @@ class LoginForm(FlaskForm):
 
 class EntryForm(FlaskForm):
     title = StringField('Başlık', validators=[Length(min=3, max=100)])
-    content = TextAreaField('İçerik', validators=[DataRequired(), Length(min=10)])
+    content = TextAreaField('İçerik', validators=[DataRequired()])
     submit = SubmitField('Gönder')
 
     def validate_title(self, title):

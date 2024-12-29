@@ -54,7 +54,7 @@ def login():
             flash('Giriş başarısız. Lütfen email ve şifrenizi kontrol edin.', 'danger')
     return render_template('auth/login.html', title='Giriş', form=form)
 
-@auth.route('/logout')
+@auth.route('/logout', methods=['POST'])
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
