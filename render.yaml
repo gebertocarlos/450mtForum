@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: 450mt-forum
+    name: 450mtforum
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn "app:create_app()"
