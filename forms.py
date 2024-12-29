@@ -31,7 +31,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Giriş Yap')
 
 class EntryForm(FlaskForm):
-    title = StringField('Başlık', validators=[DataRequired(), Length(min=3, max=100)])
+    title = StringField('Başlık', validators=[Length(min=3, max=100)])
     content = TextAreaField('İçerik', validators=[DataRequired(), Length(min=10)])
     submit = SubmitField('Gönder')
 

@@ -25,19 +25,34 @@ def home():
 @login_required
 def new_entry():
     form = EntryForm()
+    title_name = request.args.get('title')
+    
+    if title_name:
+        title = Title.query.filter_by(title=title_name).first()
+        if title and request.method == 'GET':
+            form.title.data = title.title
+    
     if form.validate_on_submit():
-        # Başlığı kontrol et veya oluştur
-        title = Title.query.filter_by(title=form.title.data).first()
-        if not title:
+        # Başlık parametresi varsa onu kullan, yoksa formdan al
+        if title_name:
+            title = Title.query.filter_by(title=title_name).first()
+        else:
+            title = Title.query.filter_by(title=form.title.data).first()
+            
+        if not title and form.title.data:
             title = Title(title=form.title.data)
             db.session.add(title)
             db.session.commit()
-
-        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
-        db.session.add(entry)
-        db.session.commit()
-        flash('Entry başarıyla oluşturuldu!', 'success')
-        return redirect(url_for('main.title', title_name=title.title))
+        
+        if title:
+            entry = Entry(content=form.content.data, author=current_user, title_obj=title)
+            db.session.add(entry)
+            db.session.commit()
+            flash('Entry başarıyla oluşturuldu!', 'success')
+            return redirect(url_for('main.title', title_name=title.title))
+        else:
+            flash('Lütfen bir başlık girin veya mevcut başlık seçin.', 'danger')
+            
     trending_topics = get_trending_topics()
     return render_template('create_entry.html', title='Yeni Entry',
                          form=form, legend='Yeni Entry', trending_topics=trending_topics)
