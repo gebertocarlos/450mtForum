@@ -56,5 +56,25 @@ document.getElementById('newTitleForm').onsubmit = function() {
     document.getElementById('hiddenContent').value = content;
     return true;
 };
+
+// Resim yükleme işlemini özelleştir
+quill.getModule('toolbar').addHandler('image', function() {
+    var input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = function() {
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            var range = quill.getSelection(true);
+            quill.insertEmbed(range.index, 'image', e.target.result);
+        };
+
+        reader.readAsDataURL(file);
+    };
+});
 </script>
 {% endblock %} 
