@@ -1,0 +1,8 @@
+                <div class="entry-list mb-4">
+                    <h2 class="entry-title">
+                        <a href="{{ url_for('main.title', title_name=entry.title_obj.title) }}" class="text-decoration-none">
+                            {{ entry.title_obj.title }}
+                        </a>
+                    </h2>
+                    <div class="entry-content mt-2">{{ entry.content|safe }}</div>
+                </div> 

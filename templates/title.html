@@ -44,7 +44,7 @@
 
             {% for entry in entries.items %}
                 <div class="entry-list mb-4">
-                    <div class="entry-content mt-2">{{ entry.content }}</div>
+                    <div class="entry-content mt-2">{{ entry.content|safe }}</div>
                     <div class="entry-footer mt-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="entry-info">

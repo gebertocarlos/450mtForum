@@ -51,13 +51,13 @@
         </div>
 
         {% for entry in entries.items %}
-            <div class="entry-list">
-                <div class="entry-metadata">
-                    <a href="{{ url_for('main.entry', entry_id=entry.id) }}" class="entry-title">
-                        {{ entry.title }}
+            <div class="entry-list mb-4">
+                <h2 class="entry-title">
+                    <a href="{{ url_for('main.title', title_name=entry.title_obj.title) }}" class="text-decoration-none">
+                        {{ entry.title_obj.title }}
                     </a>
-                </div>
-                <div class="entry-content">{{ entry.content }}</div>
+                </h2>
+                <div class="entry-content mt-2">{{ entry.content|safe }}</div>
                 <div class="entry-footer">
                     <div class="entry-info">
                         <span class="entry-date">{{ entry.date_posted.strftime('%d.%m.%Y %H:%M') }}</span>
