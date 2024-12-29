@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from extensions import db
 from models import User, Entry, Like
 from forms import EntryForm
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, desc
 
 main = Blueprint('main', __name__)
 
@@ -17,9 +17,27 @@ def get_trending_topics():
 @main.route('/home')
 def home():
     page = request.args.get('page', 1, type=int)
-    entries = Entry.query.order_by(Entry.date_posted.desc()).paginate(page=page, per_page=10)
+    per_page = 10
+    offset = (page - 1) * per_page
+    
+    total = db.session.query(func.count(Entry.id)).scalar()
+    entries = db.session.query(Entry).order_by(desc(Entry.date_posted)).limit(per_page).offset(offset).all()
+    
+    has_next = offset + per_page < total
+    has_prev = page > 1
+    
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'total': total,
+        'items': entries,
+        'has_next': has_next,
+        'has_prev': has_prev,
+        'pages': (total + per_page - 1) // per_page
+    }
+    
     trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, trending_topics=trending_topics)
+    return render_template('home.html', entries=pagination, trending_topics=trending_topics)
 
 @main.route('/entry/new', methods=['GET', 'POST'])
 @login_required
@@ -140,9 +158,34 @@ def search():
 @main.route('/popular')
 def popular():
     page = request.args.get('page', 1, type=int)
-    entries = Entry.query.join(Like).group_by(Entry.id).order_by(func.count(Like.id).desc()).paginate(page=page, per_page=10)
+    per_page = 10
+    offset = (page - 1) * per_page
+    
+    subquery = db.session.query(
+        Entry.id,
+        func.count(Like.id).label('like_count')
+    ).outerjoin(Like).group_by(Entry.id).subquery()
+    
+    total = db.session.query(func.count(Entry.id)).scalar()
+    entries = db.session.query(Entry).join(
+        subquery, Entry.id == subquery.c.id
+    ).order_by(desc(subquery.c.like_count)).limit(per_page).offset(offset).all()
+    
+    has_next = offset + per_page < total
+    has_prev = page > 1
+    
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'total': total,
+        'items': entries,
+        'has_next': has_next,
+        'has_prev': has_prev,
+        'pages': (total + per_page - 1) // per_page
+    }
+    
     trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, trending_topics=trending_topics)
+    return render_template('home.html', entries=pagination, trending_topics=trending_topics)
 
 @main.route('/entry/<int:entry_id>/reply', methods=['POST'])
 @login_required
