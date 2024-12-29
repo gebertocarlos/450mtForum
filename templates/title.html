@@ -19,9 +19,9 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row g-0">
     <!-- Desktop Gündem -->
-    <div class="col-md-4 desktop-gundem">
+    <div class="col-md-3 desktop-gundem pe-md-3">
         <div class="content-section">
             <h3>gündem</h3>
             <ul class="list-group">
@@ -36,17 +36,10 @@
             </ul>
         </div>
     </div>
-    <div class="col-md-8">
-        <article class="content-section">
+    <div class="col-md-9">
+        <article class="content-section position-relative">
             <div class="entry-metadata">
                 <h1 class="entry-title mb-3">{{ title.title }}</h1>
-                {% if current_user.is_authenticated %}
-                    <div class="mb-3">
-                        <a href="{{ url_for('main.new_entry') }}?title={{ title.title }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i> yeni entry ekle
-                        </a>
-                    </div>
-                {% endif %}
             </div>
 
             {% for entry in entries.items %}
@@ -126,6 +119,14 @@
                         {% endfor %}
                     </ul>
                 </nav>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
+                    <a href="{{ url_for('main.new_entry') }}?title={{ title.title }}" class="btn btn-primary rounded-circle shadow-lg" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plus fa-lg"></i>
+                    </a>
+                </div>
             {% endif %}
         </article>
     </div>
