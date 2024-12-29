@@ -33,4 +33,8 @@ class LoginForm(FlaskForm):
 class EntryForm(FlaskForm):
     title = StringField('Başlık', validators=[DataRequired(), Length(min=3, max=100)])
     content = TextAreaField('İçerik', validators=[DataRequired(), Length(min=10)])
-    submit = SubmitField('Gönder') 
+    submit = SubmitField('Gönder')
+
+class ReplyForm(FlaskForm):
+    content = TextAreaField('Cevabınız', validators=[DataRequired(), Length(min=10)])
+    submit = SubmitField('Cevapla') 

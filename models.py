@@ -24,7 +24,10 @@ class Entry(db.Model):
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=True)
     likes = db.relationship('Like', backref='entry', lazy=True)
+    replies = db.relationship('Entry', backref=db.backref('parent', remote_side=[id]),
+                            lazy='dynamic')
 
     def __repr__(self):
         return f"Entry('{self.title}', '{self.date_posted}')"

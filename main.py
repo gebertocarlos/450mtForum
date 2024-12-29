@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, url_for, flash, redirect, request,
 from flask_login import current_user, login_required
 from extensions import db
 from models import User, Entry, Like
-from forms import EntryForm
+from forms import EntryForm, ReplyForm
 from sqlalchemy import func, or_
 
 main = Blueprint('main', __name__)
@@ -35,11 +35,12 @@ def new_entry():
     return render_template('create_entry.html', title='Yeni Entry',
                          form=form, legend='Yeni Entry', trending_topics=trending_topics)
 
-@main.route('/entry/<int:entry_id>')
+@main.route('/entry/<int:entry_id>', methods=['GET'])
 def entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
+    form = ReplyForm()
     trending_topics = get_trending_topics()
-    return render_template('entry.html', title=entry.title, entry=entry, trending_topics=trending_topics)
+    return render_template('entry.html', title=entry.title, entry=entry, form=form, trending_topics=trending_topics)
 
 @main.route('/entry/<int:entry_id>/update', methods=['GET', 'POST'])
 @login_required
@@ -141,4 +142,21 @@ def popular():
     page = request.args.get('page', 1, type=int)
     entries = Entry.query.join(Like).group_by(Entry.id).order_by(func.count(Like.id).desc()).paginate(page=page, per_page=10)
     trending_topics = get_trending_topics()
-    return render_template('home.html', entries=entries, trending_topics=trending_topics) 
+    return render_template('home.html', entries=entries, trending_topics=trending_topics)
+
+@main.route("/entry/<int:entry_id>/reply", methods=['POST'])
+@login_required
+def reply_entry(entry_id):
+    parent_entry = Entry.query.get_or_404(entry_id)
+    form = ReplyForm()
+    if form.validate_on_submit():
+        reply = Entry(
+            title=parent_entry.title,
+            content=form.content.data,
+            author=current_user,
+            parent_id=entry_id
+        )
+        db.session.add(reply)
+        db.session.commit()
+        flash('Cevabınız başarıyla eklendi!', 'success')
+    return redirect(url_for('main.entry', entry_id=entry_id)) 
