@@ -14,8 +14,13 @@ services:
         fromDatabase:
           name: 450mtforum_db
           property: connectionString
+      - key: RENDER_DATABASE_URL
+        fromDatabase:
+          name: 450mtforum_db
+          property: connectionString
 
 databases:
   - name: 450mtforum_db
     region: frankfurt
-    plan: free 
+    plan: free
+    ipAllowList: [] 
