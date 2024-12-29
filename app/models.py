@@ -1,19 +1,46 @@
 from datetime import datetime
-from app import db, login_manager
 from flask_login import UserMixin
+from extensions import db, login_manager
+from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask import current_app
-import pytz
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class User(db.Model, UserMixin):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    date_joined = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     entries = db.relationship('Entry', backref='author', lazy=True)
+    likes = db.relationship('Like', backref='user', lazy=True)
+
+    def get_reset_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
+
+    def __repr__(self):
+        return f"User('{self.username}', '{self.email}')"
+
+class Title(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text, unique=True, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    entries = db.relationship('Entry', backref='title_obj', lazy=True)
+
+    def __repr__(self):
+        return f"Title('{self.title}')"
 
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,23 +48,16 @@ class Entry(db.Model):
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title_id = db.Column(db.Integer, db.ForeignKey('title.id'), nullable=False)
-    likes = db.relationship('User', secondary='entry_likes', backref=db.backref('liked_entries', lazy='dynamic'))
+    parent_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=True)
+    likes = db.relationship('Like', backref='entry', lazy=True)
+    replies = db.relationship('Entry', backref=db.backref('parent', remote_side=[id]),
+                            lazy='dynamic')
 
-    @property
-    def local_date_posted(self):
-        """Entry'nin oluşturulma zamanını GMT+3'e çevirir."""
-        utc_time = pytz.utc.localize(self.date_posted)
-        local_time = utc_time.astimezone(current_app.config['TIMEZONE'])
-        return local_time
+    def __repr__(self):
+        return f"Entry('{self.title_obj.title}', '{self.date_posted}')"
 
-class Title(db.Model):
+class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), unique=True, nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    entries = db.relationship('Entry', backref='title_obj', lazy=True)
-
-# Entry-Like ilişki tablosu
-entry_likes = db.Table('entry_likes',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('entry_id', db.Integer, db.ForeignKey('entry.id'), primary_key=True)
-) 
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entry_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=False)
+    date_liked = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) 

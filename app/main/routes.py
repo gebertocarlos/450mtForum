@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
 from flask_login import current_user, login_required
-from extensions import db
-from models import User, Entry, Like, Title
-from forms import EntryForm, ReplyForm
+from app import db
+from app.models import User, Entry, Like, Title
+from app.main.forms import EntryForm, ReplyForm
 from sqlalchemy import func, or_
 
 main = Blueprint('main', __name__)
