@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, request
+from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import login_user, current_user, logout_user, login_required
-from app import db, bcrypt
+from app import db, bcrypt, mail
 from app.models import User
 from app.auth.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
 from flask_mail import Message
+import traceback
 
 auth = Blueprint('auth', __name__)
 
