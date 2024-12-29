@@ -17,9 +17,9 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
     app.register_blueprint(main)
 
-    with app.app_context():
-        db.drop_all()  # Mevcut tabloları sil
-        db.create_all()  # Tabloları yeniden oluştur
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
 
     return app
 

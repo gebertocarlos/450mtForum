@@ -7,10 +7,6 @@ from sqlalchemy import func, or_
 
 main = Blueprint('main', __name__)
 
-@main.before_app_first_request
-def create_tables():
-    db.create_all()
-
 def get_trending_topics():
     return db.session.query(
         Entry.title,
