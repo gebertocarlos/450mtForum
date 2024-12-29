@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     date_joined = db.Column(db.DateTime, nullable=False, default=get_istanbul_time)
     entries = db.relationship('Entry', backref='author', lazy=True, foreign_keys='Entry.user_id')
     likes = db.relationship('Like', backref='user', lazy=True)
+    liked_entries = db.relationship('Entry', secondary='like', backref=db.backref('liked_by', lazy='dynamic'), overlaps="likes,user")
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -30,7 +31,7 @@ class Entry(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=True)
     
     replies = db.relationship('Entry', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
-    likes = db.relationship('User', secondary='like', backref=db.backref('liked_entries', lazy='dynamic'))
+    likes = db.relationship('User', secondary='like', backref=db.backref('liked_entries_rel', lazy='dynamic'), overlaps="liked_entries,liked_by")
 
     def __repr__(self):
         return f"Entry('{self.title}', '{self.date_posted}')"

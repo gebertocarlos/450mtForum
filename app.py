@@ -4,6 +4,7 @@ from extensions import db, bcrypt, login_manager
 from auth import auth
 from main import main
 import logging
+import os
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -26,6 +27,15 @@ def create_app(config_class=Config):
         try:
             logger.info("Veritabanı bağlantısı kuruluyor...")
             logger.info(f"Database URL: {app.config['SQLALCHEMY_DATABASE_URI']}")
+            
+            # SQLite veritabanını sil
+            if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite:'):
+                db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+                if os.path.exists(db_path):
+                    os.remove(db_path)
+                    logger.info("Eski SQLite veritabanı silindi.")
+            
+            # Yeni veritabanını oluştur
             db.create_all()
             logger.info("Veritabanı başarıyla oluşturuldu!")
         except Exception as e:
