@@ -24,6 +24,20 @@ body {
     color: #81c14b !important;
     font-weight: bold;
     font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    height: 30px;
+    width: auto;
+    margin-right: 0.5rem;
+    filter: invert(72%) sepia(12%) saturate(1489%) hue-rotate(54deg) brightness(91%) contrast(89%);
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.1);
 }
 
 .nav-link {
