@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}{{ title.title }}{% endblock %}
+
+{% block content %}
+<!-- Mobil Gündem -->
+<div class="mobile-gundem">
+    <div class="content-section">
+        <h3>gündem</h3>
+        <ul class="list-group">
+            {% for trend in trending_topics %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('main.title', title_name=trend.title) }}" class="text-decoration-none">
+                        {{ trend.title }}
+                    </a>
+                    <span class="badge rounded-pill">{{ trend.entry_count }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Desktop Gündem -->
+    <div class="col-md-4 desktop-gundem">
+        <div class="content-section">
+            <h3>gündem</h3>
+            <ul class="list-group">
+                {% for trend in trending_topics %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('main.title', title_name=trend.title) }}" class="text-decoration-none">
+                            {{ trend.title }}
+                        </a>
+                        <span class="badge rounded-pill">{{ trend.entry_count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <article class="content-section">
+            <div class="entry-metadata">
+                <h1 class="entry-title mb-3">{{ title.title }}</h1>
+                {% if current_user.is_authenticated %}
+                    <div class="mb-3">
+                        <a href="{{ url_for('main.new_entry') }}?title={{ title.title }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> yeni entry ekle
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% for entry in entries.items %}
+                <div class="entry-list mb-4">
+                    <div class="entry-metadata">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                <a href="{{ url_for('main.profile', username=entry.author.username) }}" class="text-decoration-none">
+                                    {{ entry.author.username }}
+                                </a>
+                                tarafından {{ entry.date_posted.strftime('%d.%m.%Y %H:%M') }}
+                            </div>
+                            {% if entry.author == current_user %}
+                                <div>
+                                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.update_entry', entry_id=entry.id) }}">
+                                        <i class="fas fa-edit"></i> düzenle
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ entry.id }}">
+                                        <i class="fas fa-trash"></i> sil
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="entry-content mt-2">{{ entry.content }}</div>
+                    <div class="entry-footer mt-2">
+                        <div class="entry-actions">
+                            {% if current_user.is_authenticated %}
+                                <form action="{{ url_for('main.like_entry', entry_id=entry.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm {% if current_user in entry.likes %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                        <i class="fas fa-heart"></i> {{ entry.likes|length }}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted">
+                                    <i class="fas fa-heart"></i> {{ entry.likes|length }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if entry.author == current_user %}
+                    <div class="modal fade" id="deleteModal{{ entry.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">entry'yi sil</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    bu entry'yi silmek istediğinizden emin misiniz?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">iptal</button>
+                                    <form action="{{ url_for('main.delete_entry', entry_id=entry.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-danger">sil</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if entries.pages > 1 %}
+                <nav aria-label="Sayfa navigasyonu">
+                    <ul class="pagination justify-content-center">
+                        {% for page_num in entries.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                            {% if page_num %}
+                                <li class="page-item {% if entries.page == page_num %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('main.title', title_name=title.title, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </article>
+    </div>
+</div>
+{% endblock content %} 

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
 from flask_login import current_user, login_required
 from extensions import db
-from models import User, Entry, Like
+from models import User, Entry, Like, Title
 from forms import EntryForm, ReplyForm
 from sqlalchemy import func, or_
 
@@ -9,9 +9,9 @@ main = Blueprint('main', __name__)
 
 def get_trending_topics():
     return db.session.query(
-        Entry.title,
+        Title.title,
         func.count(Entry.id).label('entry_count')
-    ).group_by(Entry.title).order_by(func.count(Entry.id).desc()).limit(10).all()
+    ).join(Entry).group_by(Title.title).order_by(func.count(Entry.id).desc()).limit(10).all()
 
 @main.route('/')
 @main.route('/home')
@@ -26,21 +26,38 @@ def home():
 def new_entry():
     form = EntryForm()
     if form.validate_on_submit():
-        entry = Entry(title=form.title.data, content=form.content.data, author=current_user)
+        # Başlığı kontrol et veya oluştur
+        title = Title.query.filter_by(title=form.title.data).first()
+        if not title:
+            title = Title(title=form.title.data)
+            db.session.add(title)
+            db.session.commit()
+
+        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
         db.session.add(entry)
         db.session.commit()
         flash('Entry başarıyla oluşturuldu!', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.title', title_name=title.title))
     trending_topics = get_trending_topics()
     return render_template('create_entry.html', title='Yeni Entry',
                          form=form, legend='Yeni Entry', trending_topics=trending_topics)
+
+@main.route('/title/<string:title_name>')
+def title(title_name):
+    page = request.args.get('page', 1, type=int)
+    title = Title.query.filter_by(title=title_name).first_or_404()
+    entries = Entry.query.filter_by(title_id=title.id)\
+        .order_by(Entry.date_posted.asc())\
+        .paginate(page=page, per_page=10)
+    trending_topics = get_trending_topics()
+    return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics)
 
 @main.route('/entry/<int:entry_id>', methods=['GET'])
 def entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
     form = ReplyForm()
     trending_topics = get_trending_topics()
-    return render_template('entry.html', title=entry.title, entry=entry, form=form, trending_topics=trending_topics)
+    return render_template('entry.html', title=entry.title_obj.title, entry=entry, form=form, trending_topics=trending_topics)
 
 @main.route('/entry/<int:entry_id>/update', methods=['GET', 'POST'])
 @login_required
@@ -50,13 +67,20 @@ def update_entry(entry_id):
         abort(403)
     form = EntryForm()
     if form.validate_on_submit():
-        entry.title = form.title.data
+        # Başlığı güncelleme
+        title = Title.query.filter_by(title=form.title.data).first()
+        if not title:
+            title = Title(title=form.title.data)
+            db.session.add(title)
+            db.session.commit()
+        
+        entry.title_obj = title
         entry.content = form.content.data
         db.session.commit()
         flash('Entry başarıyla güncellendi!', 'success')
         return redirect(url_for('main.entry', entry_id=entry.id))
     elif request.method == 'GET':
-        form.title.data = entry.title
+        form.title.data = entry.title_obj.title
         form.content.data = entry.content
     trending_topics = get_trending_topics()
     return render_template('create_entry.html', title='Entry Güncelle',
@@ -68,10 +92,19 @@ def delete_entry(entry_id):
     entry = Entry.query.get_or_404(entry_id)
     if entry.author != current_user:
         abort(403)
+    title = entry.title_obj
     db.session.delete(entry)
     db.session.commit()
+
+    # Başlık altında başka entry kalmadıysa başlığı da sil
+    if len(title.entries) == 0:
+        db.session.delete(title)
+        db.session.commit()
+        flash('Entry ve başlık başarıyla silindi!', 'success')
+        return redirect(url_for('main.home'))
+    
     flash('Entry başarıyla silindi!', 'success')
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.title', title_name=title.title))
 
 @main.route('/user/<string:username>')
 def profile(username):
@@ -111,7 +144,7 @@ def search():
             if user:
                 return redirect(url_for('main.profile', username=user.username))
             else:
-                entries = Entry.query.filter(Entry.title.contains(query)).paginate(page=page, per_page=10)
+                entries = Entry.query.join(Title).filter(Title.title.contains(query)).paginate(page=page, per_page=10)
         # Entry araması (#entry_id)
         elif query.startswith('#'):
             try:
@@ -121,12 +154,12 @@ def search():
                     return redirect(url_for('main.entry', entry_id=entry.id))
             except ValueError:
                 pass
-            entries = Entry.query.filter(Entry.title.contains(query)).paginate(page=page, per_page=10)
+            entries = Entry.query.join(Title).filter(Title.title.contains(query)).paginate(page=page, per_page=10)
         # Normal arama (başlık ve içerik)
         else:
-            entries = Entry.query.join(User).filter(
+            entries = Entry.query.join(Title).join(User).filter(
                 or_(
-                    Entry.title.contains(query),
+                    Title.title.contains(query),
                     Entry.content.contains(query),
                     User.username.contains(query)
                 )
@@ -151,7 +184,7 @@ def reply_entry(entry_id):
     form = ReplyForm()
     if form.validate_on_submit():
         reply = Entry(
-            title=parent_entry.title,
+            title_obj=parent_entry.title_obj,
             content=form.content.data,
             author=current_user,
             parent_id=entry_id

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from models import User
+from models import User, Title
 
 class RegistrationForm(FlaskForm):
     username = StringField('Kullanıcı Adı',
@@ -34,6 +34,10 @@ class EntryForm(FlaskForm):
     title = StringField('Başlık', validators=[DataRequired(), Length(min=3, max=100)])
     content = TextAreaField('İçerik', validators=[DataRequired(), Length(min=10)])
     submit = SubmitField('Gönder')
+
+    def validate_title(self, title):
+        # Başlık varsa hata verme, yeni entry olarak eklenecek
+        pass
 
 class ReplyForm(FlaskForm):
     content = TextAreaField('Cevabınız', validators=[DataRequired(), Length(min=10)])
