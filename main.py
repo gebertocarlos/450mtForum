@@ -57,15 +57,23 @@ def new_entry():
     return render_template('create_entry.html', title='Yeni Entry',
                          form=form, legend='Yeni Entry', trending_topics=trending_topics)
 
-@main.route('/title/<string:title_name>')
+@main.route('/title/<string:title_name>', methods=['GET', 'POST'])
 def title(title_name):
     page = request.args.get('page', 1, type=int)
     title = Title.query.filter_by(title=title_name).first_or_404()
+    form = EntryForm()
+    
+    if form.validate_on_submit():
+        entry = Entry(content=form.content.data, author=current_user, title_obj=title)
+        db.session.add(entry)
+        db.session.commit()
+        flash('Entry başarıyla eklendi!', 'success')
+        return redirect(url_for('main.title', title_name=title.title))
+        
     entries = Entry.query.filter_by(title_id=title.id)\
         .order_by(Entry.date_posted.asc())\
         .paginate(page=page, per_page=10)
     trending_topics = get_trending_topics()
-    form = EntryForm()
     if title:
         form.title.data = title.title
     return render_template('title.html', title=title, entries=entries, trending_topics=trending_topics, form=form)
