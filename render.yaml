@@ -15,6 +15,10 @@ services:
         fromDatabase:
           name: 450mtforum_db
           property: connectionString
+    disk:
+      name: logs
+      mountPath: /opt/render/project/src/logs
+      sizeGB: 1
 
   - type: postgres
     name: 450mtforum_db
