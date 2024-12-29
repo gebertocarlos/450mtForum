@@ -2,6 +2,7 @@ services:
   - type: web
     name: 450mtforum
     env: python
+    region: frankfurt
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn "app:create_app()"
     envVars:
@@ -10,4 +11,11 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false 
+        fromDatabase:
+          name: 450mtforum_db
+          property: connectionString
+
+databases:
+  - name: 450mtforum_db
+    region: frankfurt
+    plan: free 
