@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     date_joined = db.Column(db.DateTime, nullable=False, default=get_istanbul_time)
-    entries = db.relationship('Entry', backref='author', lazy=True)
+    entries = db.relationship('Entry', backref='author', lazy=True, foreign_keys='Entry.user_id')
     likes = db.relationship('Like', backref='user', lazy=True)
 
     def __repr__(self):
@@ -29,9 +29,8 @@ class Entry(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=True)
     
-    author = db.relationship('User', backref='entries')
-    likes = db.relationship('User', secondary='like', backref='liked_entries')
     replies = db.relationship('Entry', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+    likes = db.relationship('User', secondary='like', backref=db.backref('liked_entries', lazy='dynamic'))
 
     def __repr__(self):
         return f"Entry('{self.title}', '{self.date_posted}')"

@@ -17,9 +17,9 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
     app.register_blueprint(main)
 
-    # Veritabanını oluştur
     with app.app_context():
-        db.create_all()
+        db.drop_all()  # Mevcut tabloları sil
+        db.create_all()  # Tabloları yeniden oluştur
 
     return app
 
